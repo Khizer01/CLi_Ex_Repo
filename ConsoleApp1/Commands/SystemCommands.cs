@@ -21,6 +21,12 @@ namespace ConsoleApp1
             Console.WriteLine("  edit <file>        - Edit file content");
             Console.WriteLine("  cat <file>         - Display file content");
             Console.WriteLine("  delete <path>      - Delete a file or empty directory");
+            Console.WriteLine("  copy <src> <dst>   - Copy file or directory");
+            Console.WriteLine("  info <path>        - Show info about file or directory");
+            Console.WriteLine("  pwd                - Show current directory");
+            Console.WriteLine("  date               - Show current date");
+            Console.WriteLine("  time               - Show current time");
+            Console.WriteLine("  echo <text>        - Print text to the console");
             Console.WriteLine("  help               - Display this help information");
             Console.WriteLine("  exit               - Exit the shell");
             Console.WriteLine("  tasks              - Open the interactive task manager");
@@ -30,6 +36,32 @@ namespace ConsoleApp1
         {
             Console.WriteLine("Exiting shell...");
             _shell.StopShell();
+        }
+
+        public void Date(string[] args)
+        {
+            Console.WriteLine(DateTime.Now.ToString("yyyy-MM-dd"));
+        }
+
+        public void Time(string[] args)
+        {
+            Console.WriteLine(DateTime.Now.ToString("HH:mm:ss"));
+        }
+
+        public void Pwd(string[] args)
+        {
+            Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
+        }
+
+        public void Echo(string[] args)
+        {
+            if (args == null || args.Length == 0)
+            {
+                Console.WriteLine();
+                return;
+            }
+
+            Console.WriteLine(string.Join(" ", args));
         }
     }
 }

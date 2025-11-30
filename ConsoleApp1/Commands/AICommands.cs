@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +12,7 @@ namespace ConsoleApp1
     {
         private static readonly HttpClient _httpClient;
         private readonly string _apiKey;
-        private const string API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5:generateContent";
+        private const string API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
         static AICommands()
         {
             _httpClient = new HttpClient();
@@ -30,7 +28,7 @@ namespace ConsoleApp1
         // Non-async wrapper method that matches the Action<string[]> delegate signature
         public void AskAI(string[] args)
         {
-            Console.WriteLine("Starting AI Chat with Gemini. Type 'exit' to end the conversation.");
+            Console.WriteLine("Starting AI Chat. Type 'exit' to end the conversation.");
             Console.WriteLine("----------------------------------------");
 
             string userInput;
@@ -38,7 +36,7 @@ namespace ConsoleApp1
             {
                 Console.Write("You: ");
                 userInput = Console.ReadLine();
-                
+
                 if (string.IsNullOrEmpty(userInput) || userInput.ToLower() == "exit")
                     break;
 
@@ -77,8 +75,8 @@ namespace ConsoleApp1
             };
 
             // Serialize with optimized settings
-            string jsonRequest = JsonConvert.SerializeObject(requestContent, new JsonSerializerSettings { 
-                NullValueHandling = NullValueHandling.Ignore 
+            string jsonRequest = JsonConvert.SerializeObject(requestContent, new JsonSerializerSettings {
+                NullValueHandling = NullValueHandling.Ignore
             });
 
             // Create the request with cached URL
@@ -86,45 +84,45 @@ namespace ConsoleApp1
             using (var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json"))
             {
                 // Send the request with cancellation support
-                using (var response = await _httpClient.PostAsync(requestUrl, content).ConfigureAwait(false))
-                {
-                    string jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    
-                    if (!response.IsSuccessStatusCode)
+                    using (var response = await _httpClient.PostAsync(requestUrl, content).ConfigureAwait(false))
                     {
+                        string jsonResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                        if (!response.IsSuccessStatusCode)
+                        {
                         return $"API Error: {response.StatusCode} - {jsonResponse}";
+                            }
+
+                        // Extract response using JObject for better performance
+                        return ParseResponseWithJson(jsonResponse);
                     }
-                    
-                    // Extract response using JObject for better performance
-                    return ParseResponseWithJson(jsonResponse);
                 }
-            }
         }
 
         private string ParseResponseWithJson(string jsonResponse)
         {
-            try 
+            try
             {
                 // Use JObject for faster and more reliable parsing
                 JObject response = JObject.Parse(jsonResponse);
-                
+
                 // Navigate the JSON structure to find the text content
                 JToken candidates = response["candidates"];
                 if (candidates != null && candidates.Type == JTokenType.Array && candidates.HasValues)
                 {
                     JToken content = candidates[0]?["content"];
                     JToken parts = content?["parts"];
-                    
-                    if (parts != null && parts.Type == JTokenType.Array && parts.HasValues)
-                    {
-                        string text = parts[0]?["text"]?.ToString();
-                        if (!string.IsNullOrEmpty(text))
+
+                        if (parts != null && parts.Type == JTokenType.Array && parts.HasValues)
                         {
-                            return text;
+                        string text = parts[0]?["text"]?.ToString();
+                            if (!string.IsNullOrEmpty(text))
+                        {
+                                return text;
                         }
                     }
                 }
-                
+
                 return "Could not parse AI response.";
             }
             catch

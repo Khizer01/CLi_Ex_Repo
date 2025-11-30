@@ -116,5 +116,105 @@ namespace ConsoleApp1
                 Console.WriteLine($"File or directory not found: {path}");
             }
         }
+
+        // New: copy command - supports files and directories
+        public void Copy(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: copy <source> <destination>");
+                return;
+            }
+
+            string source = args[0];
+            string destination = args[1];
+
+            try
+            {
+                if (File.Exists(source))
+                {
+                    File.Copy(source, destination, overwrite: false);
+                    Console.WriteLine($"File copied from {source} to {destination}");
+                }
+                else if (Directory.Exists(source))
+                {
+                    DirectoryCopy(source, destination);
+                    Console.WriteLine($"Directory copied from {source} to {destination}");
+                }
+                else
+                {
+                    Console.WriteLine($"Source not found: {source}");
+                }
+            }
+            catch (IOException ioEx)
+            {
+                Console.WriteLine("IO Error: " + ioEx.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+        // New: info command - display file or directory information
+        public void Info(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: info <path>");
+                return;
+            }
+
+            string path = args[0];
+
+            if (File.Exists(path))
+            {
+                var fi = new FileInfo(path);
+                Console.WriteLine($"File: {fi.FullName}");
+                Console.WriteLine($"Size: {fi.Length} bytes");
+                Console.WriteLine($"Created: {fi.CreationTime}");
+                Console.WriteLine($"Modified: {fi.LastWriteTime}");
+            }
+            else if (Directory.Exists(path))
+            {
+                var di = new DirectoryInfo(path);
+                Console.WriteLine($"Directory: {di.FullName}");
+                Console.WriteLine($"Created: {di.CreationTime}");
+                Console.WriteLine($"Modified: {di.LastWriteTime}");
+                Console.WriteLine($"Contains: {di.GetFiles().Length} files, {di.GetDirectories().Length} directories");
+            }
+            else
+            {
+                Console.WriteLine($"Path not found: {path}");
+            }
+        }
+
+        // Helper to copy directories recursively
+        private void DirectoryCopy(string sourceDirName, string destDirName)
+        {
+            // Create destination directory if it doesn't exist
+            var dir = new DirectoryInfo(sourceDirName);
+            if (!dir.Exists)
+                throw new DirectoryNotFoundException("Source directory does not exist: " + sourceDirName);
+
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Copy files
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                string tempPath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(tempPath, false);
+            }
+
+            // Copy subdirectories
+            foreach (DirectoryInfo subdir in dir.GetDirectories())
+            {
+                string tempPath = Path.Combine(destDirName, subdir.Name);
+                DirectoryCopy(subdir.FullName, tempPath);
+            }
+        }
     }
 }
