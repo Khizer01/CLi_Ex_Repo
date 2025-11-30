@@ -33,15 +33,21 @@ namespace ConsoleApp1
                 { "edit", fileCommands.EditFile },
                 { "cat", fileCommands.DisplayFileContents },
                 { "delete", fileCommands.DeleteFile },
+                { "copy", fileCommands.Copy },
+                { "info", fileCommands.Info },
                 
                 // System commands
                 { "help", systemCommands.ShowHelp },
                 { "exit", systemCommands.Exit },
+                { "date", systemCommands.Date },
+                { "time", systemCommands.Time },
+                { "pwd", systemCommands.Pwd },
+                { "echo", systemCommands.Echo },
                 
                 // AI commands
                 { "ask-ai", aiCommands.AskAI },
-                { "tasks", taskManagerCommands.ShowTaskManager } // Add this to your commands dictionary in the CommandShell constructor    
-                // Remove the set-api-key command as it's no longer needed
+                // Task manager
+                { "tasks", taskManagerCommands.ShowTaskManager }
             };
         }
 
