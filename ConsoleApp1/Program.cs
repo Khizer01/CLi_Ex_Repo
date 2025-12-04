@@ -6,9 +6,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string apiKey = "AIzaSyDNX1my7VNyONDLV9TS3vN6pGIXaQFsfhA";
-            CommandShell shell = new CommandShell(apiKey);
-            shell.Run();
+           // string apiKey = "AIzaSyDNX1my7VNyONDLV9TS3vN6pGIXaQFsfhA";
+            //CommandShell shell = new CommandShell(apiKey);
+           // shell.Run();
         }
     }
 }
